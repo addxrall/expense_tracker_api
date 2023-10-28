@@ -1,0 +1,32 @@
+type User {
+  id: Int!
+  email: String!
+  username: String
+  expenses: [Expense!]!
+}
+
+type Expense {
+  id: String!
+  name: String!
+  description: String
+  tags: [String!]!
+  user: User!
+}
+
+input ExpenseInput {
+  name: String!
+  description: String
+  tags: [String!]!
+  userId: Int!
+}
+
+type Query {
+  getExpensesByUserId(userId: Int!): [Expense!]!
+  getExpenseById(id: String!): Expense
+}
+
+type Mutation {
+  createExpense(input: ExpenseInput!): Expense!
+  updateExpense(input: ExpenseInput!): Expense
+  deleteExpense(id: String!): Expense
+}

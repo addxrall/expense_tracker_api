@@ -1,18 +1,18 @@
 const { PrismaClient } = require("@prisma/client");
-import { extractSelection } from "../utils/extractSelections";
 import { GraphQLResolveInfo } from "graphql";
+import { User } from "../types";
 
 interface GetUsersArgs {
   info: GraphQLResolveInfo;
 }
 
 interface GetUserArgs extends GetUsersArgs {
-  id: string;
+  id: number;
 }
 
 interface UserInput {
   email: string;
-  username?: string;
+  username: string;
 }
 
 const prisma = new PrismaClient();
