@@ -15,6 +15,11 @@ interface UserInput {
   username: string;
 }
 
+interface UserLoginInput {
+  email: string;
+  password: string;
+}
+
 const prisma = new PrismaClient();
 
 export const getUsers = async () => {
@@ -27,6 +32,16 @@ export const getUser = async ({ id }: GetUserArgs) => {
 
 export const createUser = async ({ email, username }: UserInput) => {
   console.log({ email, username });
+
+  const existingUser = await prisma.user.findFirst({
+    where: {
+      OR: [{ username }, { email }],
+    },
+  });
+
+  if (existingUser) {
+    return new Error("Email or Username is already in use");
+  }
 
   const createdUser = await prisma.user.create({
     data: {
