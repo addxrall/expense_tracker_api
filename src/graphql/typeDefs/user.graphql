@@ -29,6 +29,5 @@ type Query {
 }
 
 type Mutation {
-  deleteUser(id: Int!): User
   registerUser(registerUserInput: RegisterUserInput): User
 }

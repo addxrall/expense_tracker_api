@@ -1,7 +1,10 @@
-import { RegisterUserInputT } from "./../types";
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const { PrismaClient } = require("@prisma/client");
+import { RegisterUserInputT } from "./../types";
 import { GraphQLResolveInfo } from "graphql";
 import { User } from "../types";
+import { env } from "process";
 
 interface GetUsersArgs {
   info: GraphQLResolveInfo;
@@ -31,33 +34,44 @@ export const getUser = async ({ id }: GetUserArgs) => {
   return await prisma.user.findUnique({ where: { id } });
 };
 
-export const registerUser = async ({
+export const createNewUser = async ({
   username,
   email,
   password,
 }: RegisterUserInputT) => {
-  console.log(username, email, password);
+  const jwtKey = process.env.JWT;
+  if (!jwtKey) {
+    throw new Error("Cannot get JWT KEY from server files");
+  }
+
+  const existingUser = await prisma.user.findUnique({ where: { email } });
+
+  if (existingUser) {
+    throw new Error("User with this email already exists");
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const newUser = await prisma.user.create({
+    data: {
+      username,
+      email,
+      password: hashedPassword,
+    },
+  });
+
+  const token = jwt.sign({ userId: newUser.id, email: newUser.email }, jwtKey, {
+    expiresIn: "2h",
+  });
+
+  newUser.token = token;
+
+  await prisma.user.update({
+    where: { id: newUser.id },
+    data: { token },
+  });
+
+  console.log(`USER CREATED WITH EMAIL: ${email} AND USERNAME: ${username}`);
+
+  return newUser;
 };
-
-// export const createUser = async ({ email, username }: UserInput) => {
-//   console.log({ email, username });
-
-//   const existingUser = await prisma.user.findFirst({
-//     where: {
-//       OR: [{ username }, { email }],
-//     },
-//   });
-
-//   if (existingUser) {
-//     return new Error("Email or Username is already in use");
-//   }
-
-//   const createdUser = await prisma.user.create({
-//     data: {
-//       email,
-//       username,
-//     },
-//   });
-
-//   return createdUser;
-// };

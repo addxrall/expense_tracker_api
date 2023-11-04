@@ -1,1 +1,2 @@
 DATABASE_URL="postgresql://user:password@localhost:5432/databasename?schema=public"
+JWT_KEY="key that you have to generate by yourself"
