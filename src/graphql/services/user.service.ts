@@ -3,8 +3,6 @@ const bcrypt = require("bcrypt");
 const { PrismaClient } = require("@prisma/client");
 import { RegisterUserInputT } from "./../types";
 import { GraphQLResolveInfo } from "graphql";
-import { User } from "../types";
-import { env } from "process";
 
 interface GetUsersArgs {
   info: GraphQLResolveInfo;
@@ -12,16 +10,6 @@ interface GetUsersArgs {
 
 interface GetUserArgs extends GetUsersArgs {
   id: number;
-}
-
-interface UserInput {
-  email: string;
-  username: string;
-}
-
-interface UserLoginInput {
-  email: string;
-  password: string;
 }
 
 const prisma = new PrismaClient();
