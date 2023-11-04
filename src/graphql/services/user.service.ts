@@ -1,3 +1,4 @@
+import { RegisterUserInputT } from "./../types";
 const { PrismaClient } = require("@prisma/client");
 import { GraphQLResolveInfo } from "graphql";
 import { User } from "../types";
@@ -30,25 +31,33 @@ export const getUser = async ({ id }: GetUserArgs) => {
   return await prisma.user.findUnique({ where: { id } });
 };
 
-export const createUser = async ({ email, username }: UserInput) => {
-  console.log({ email, username });
-
-  const existingUser = await prisma.user.findFirst({
-    where: {
-      OR: [{ username }, { email }],
-    },
-  });
-
-  if (existingUser) {
-    return new Error("Email or Username is already in use");
-  }
-
-  const createdUser = await prisma.user.create({
-    data: {
-      email,
-      username,
-    },
-  });
-
-  return createdUser;
+export const registerUser = async ({
+  username,
+  email,
+  password,
+}: RegisterUserInputT) => {
+  console.log(username, email, password);
 };
+
+// export const createUser = async ({ email, username }: UserInput) => {
+//   console.log({ email, username });
+
+//   const existingUser = await prisma.user.findFirst({
+//     where: {
+//       OR: [{ username }, { email }],
+//     },
+//   });
+
+//   if (existingUser) {
+//     return new Error("Email or Username is already in use");
+//   }
+
+//   const createdUser = await prisma.user.create({
+//     data: {
+//       email,
+//       username,
+//     },
+//   });
+
+//   return createdUser;
+// };

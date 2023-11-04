@@ -1,5 +1,6 @@
+import { RegisterUserInputT } from "./../types";
 import { GraphQLResolveInfo } from "graphql";
-import { createUser, getUser, getUsers } from "../services/user.service";
+import { getUser, getUsers, registerUser } from "../services/user.service";
 
 export const usersResolver = {
   Query: {
@@ -21,10 +22,16 @@ export const usersResolver = {
     },
   },
   Mutation: {
-    async createUser(_: any, { input }: Record<string, any>) {
-      return await createUser({ email: input.email, username: input.username });
+    // async createUser(_: any, { input }: Record<string, any>) {
+    //   return await createUser({ email: input.email, username: input.username });
+    // },
+    async registerUser(
+      _: any,
+      { username, email, password }: RegisterUserInputT,
+      context: any,
+      info: GraphQLResolveInfo
+    ) {
+      return await registerUser({ username, email, password });
     },
-    async updateUser() {},
-    async deleteUser() {},
   },
 };

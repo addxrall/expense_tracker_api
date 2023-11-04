@@ -13,6 +13,12 @@ export type User = {
   username: string;
 };
 
+export type RegisterUserInputT = {
+  username: string;
+  email: string;
+  password: string;
+};
+
 export interface ExpenseInput {
   name: string;
   description?: string;
