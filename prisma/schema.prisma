@@ -24,6 +24,7 @@ model Expense {
   name        String
   description String?
   tags        String[]
+  amount      Int
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
 }

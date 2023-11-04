@@ -1,22 +1,24 @@
-type User {
-  id: Int!
-  email: String!
-  username: String
-  expenses: [Expense!]!
-}
-
 type Expense {
   id: String!
   name: String!
   description: String
+  amount: Int!
   tags: [String!]!
-  user: User!
 }
 
 input ExpenseInput {
   name: String!
+  amount: Int!
   description: String
   tags: [String!]!
+  userId: Int!
+}
+
+input UpdateExpenseInput {
+  name: String
+  amount: Int
+  description: String
+  tags: [String!]
   userId: Int!
 }
 
@@ -27,6 +29,6 @@ type Query {
 
 type Mutation {
   createExpense(input: ExpenseInput!): Expense!
-  updateExpense(input: ExpenseInput!): Expense
+  updateExpense(input: UpdateExpenseInput!, expenseId: String!): Expense
   deleteExpense(id: String!): Expense
 }
