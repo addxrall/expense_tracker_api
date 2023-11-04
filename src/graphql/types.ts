@@ -21,6 +21,11 @@ export type RegisterUserInputT = {
   password: string;
 };
 
+export type LoginUserInputT = {
+  email: string;
+  password: string;
+};
+
 export interface ExpenseInput {
   name: string;
   description?: string;

@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { PrismaClient } = require("@prisma/client");
-import { RegisterUserInputT } from "./../types";
+import { LoginUserInputT, RegisterUserInputT } from "./../types";
 import { GraphQLResolveInfo } from "graphql";
 
 interface GetUsersArgs {
@@ -13,6 +13,7 @@ interface GetUserArgs extends GetUsersArgs {
 }
 
 const prisma = new PrismaClient();
+const jwtKey = process.env.JWT;
 
 export const getUsers = async () => {
   return await prisma.user.findMany();
@@ -27,7 +28,6 @@ export const createNewUser = async ({
   email,
   password,
 }: RegisterUserInputT) => {
-  const jwtKey = process.env.JWT;
   if (!jwtKey) {
     throw new Error("Cannot get JWT KEY from server files");
   }
@@ -62,4 +62,36 @@ export const createNewUser = async ({
   console.log(`USER CREATED WITH EMAIL: ${email} AND USERNAME: ${username}`);
 
   return newUser;
+};
+
+export const login = async ({ email, password }: LoginUserInputT) => {
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user) {
+    throw new Error("User with this email does not exist");
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw new Error("Invalid password");
+  }
+
+  const jwtKey = process.env.JWT;
+  if (!jwtKey) {
+    throw new Error("Cannot get JWT KEY from server files");
+  }
+
+  const token = jwt.sign({ userId: user.id, email: user.email }, jwtKey, {
+    expiresIn: "2h",
+  });
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { token },
+  });
+
+  console.log(`LOGIN REQUEST FOR USER WITH EMAIL: ${email}`);
+
+  return { ...user, token };
 };

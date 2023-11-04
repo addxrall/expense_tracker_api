@@ -1,6 +1,11 @@
-import { RegisterUserInputT } from "./../types";
+import { LoginUserInputT, RegisterUserInputT } from "./../types";
 import { GraphQLResolveInfo } from "graphql";
-import { getUser, getUsers, createNewUser } from "../services/user.service";
+import {
+  getUser,
+  getUsers,
+  createNewUser,
+  login,
+} from "../services/user.service";
 
 export const usersResolver = {
   Query: {
@@ -29,6 +34,14 @@ export const usersResolver = {
       info: GraphQLResolveInfo
     ) {
       return await createNewUser(registerUserInput);
+    },
+    async loginUser(
+      _: any,
+      { loginUserInput }: { loginUserInput: LoginUserInputT },
+      context: any,
+      info: GraphQLResolveInfo
+    ) {
+      return await login(loginUserInput);
     },
   },
 };

@@ -30,4 +30,5 @@ type Query {
 
 type Mutation {
   registerUser(registerUserInput: RegisterUserInput): User
+  loginUser(loginUserInput: LoginUserInput): User
 }
