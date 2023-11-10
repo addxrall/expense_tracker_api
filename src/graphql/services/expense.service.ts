@@ -19,6 +19,14 @@ interface ExpenseInput {
 const prisma = new PrismaClient();
 
 export const getExpensesByUserId = async (userId: number) => {
+  const userExists = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!userExists) {
+    throw new Error(`User does not exist`);
+  }
+
   return await prisma.expense.findMany({
     where: {
       userId: userId,
@@ -42,10 +50,10 @@ export const createExpense = async ({
   const userExists = await prisma.user.findUnique({
     where: { id: userId },
   });
-
   if (!userExists) {
     throw new Error(`User does not exist`);
   }
+
   const createdExpense = await prisma.expense.create({
     data: {
       name,

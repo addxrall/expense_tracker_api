@@ -23,23 +23,20 @@ export const getUser = async ({ id }: GetUserArgs) => {
   return await prisma.user.findUnique({ where: { id } });
 };
 
-export const createNewUser = async ({
-  username,
-  email,
-  password,
-}: RegisterUserInputT) => {
+export const createNewUser = async (
+  { username, email, password }: RegisterUserInputT,
+  res: any
+) => {
   if (!jwtKey) {
     throw new Error("Cannot get JWT KEY from server files");
   }
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
-
   if (existingUser) {
     throw new Error("User with this email already exists");
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-
   const newUser = await prisma.user.create({
     data: {
       username,
@@ -49,46 +46,45 @@ export const createNewUser = async ({
   });
 
   const token = jwt.sign({ userId: newUser.id, email: newUser.email }, jwtKey, {
-    expiresIn: "2h",
-  });
-
-  newUser.token = token;
-
-  await prisma.user.update({
-    where: { id: newUser.id },
-    data: { token },
+    expiresIn: "7d",
   });
 
   console.log(`USER CREATED WITH EMAIL: ${email} AND USERNAME: ${username}`);
 
-  return newUser;
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: false,
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+  });
+
+  return { ...newUser, token };
 };
 
-export const login = async ({ email, password }: LoginUserInputT) => {
+export const login = async ({ email, password }: LoginUserInputT, res: any) => {
   const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user) {
-    throw new Error("User with this email does not exist");
+    throw new Error("Invalid email or password");
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
-    throw new Error("Invalid password");
+    throw new Error("Invalid email or password");
   }
 
-  const jwtKey = process.env.JWT;
   if (!jwtKey) {
     throw new Error("Cannot get JWT KEY from server files");
   }
 
   const token = jwt.sign({ userId: user.id, email: user.email }, jwtKey, {
-    expiresIn: "2h",
+    expiresIn: "7d",
   });
 
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { token },
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.ENV === "prod",
+    maxAge: 1000 * 60 * 60 * 24 * 7,
   });
 
   console.log(`LOGIN REQUEST FOR USER WITH EMAIL: ${email}`);

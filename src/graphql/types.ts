@@ -14,7 +14,6 @@ export type User = {
   email: string;
   username: string;
   password: string;
-  token: string;
 };
 
 export type RegisterUserInputT = {

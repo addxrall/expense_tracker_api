@@ -12,17 +12,25 @@ export const usersResolver = {
     async users(
       _: any,
       args: Record<string, any>,
-      context: any,
+      { req }: any,
       info: GraphQLResolveInfo
     ) {
+      if (!req.userId) {
+        throw new Error("Authentication required");
+      }
+
       return await getUsers();
     },
     async user(
       _: any,
       args: Record<string, any>,
-      context: any,
+      { req }: any,
       info: GraphQLResolveInfo
     ) {
+      if (!req.userId) {
+        throw new Error("Authentication required");
+      }
+
       return await getUser({ id: args.id, info });
     },
   },
@@ -30,18 +38,18 @@ export const usersResolver = {
     async registerUser(
       _: any,
       { registerUserInput }: { registerUserInput: RegisterUserInputT },
-      context: any,
+      { res }: any,
       info: GraphQLResolveInfo
     ) {
-      return await createNewUser(registerUserInput);
+      return await createNewUser(registerUserInput, res);
     },
     async loginUser(
       _: any,
       { loginUserInput }: { loginUserInput: LoginUserInputT },
-      context: any,
+      { res }: any,
       info: GraphQLResolveInfo
     ) {
-      return await login(loginUserInput);
+      return await login(loginUserInput, res);
     },
   },
 };
