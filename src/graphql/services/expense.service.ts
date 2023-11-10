@@ -83,7 +83,6 @@ export const updateExpense = async (
     throw new Error(`Expense with ID ${expenseId} does not exist`);
   }
 
-  // Proceed with updating the expense
   const updatedExpense = await prisma.expense.update({
     where: { id: expenseId },
     data: input,

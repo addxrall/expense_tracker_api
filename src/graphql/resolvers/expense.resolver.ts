@@ -7,73 +7,51 @@ import {
   deleteExpense,
 } from "../services/expense.service";
 import { ExpenseInput, UpdateExpenseArgs, UpdateExpenseInput } from "../types";
+import { userAuthResolver } from "../utils/authResolver";
 
 export const expenseResolver = {
   Query: {
-    async getExpensesByUserId(
-      _: any,
-      args: { userId: number },
-      { req }: any,
-      info: GraphQLResolveInfo
-    ) {
-      if (!req.userId) {
-        throw new Error("Authentication required");
+    getExpensesByUserId: userAuthResolver(
+      async (_: any, args: { userId: number }) => {
+        return await getExpensesByUserId(args.userId);
       }
-
-      return await getExpensesByUserId(args.userId);
-    },
-    async getExpenseById(
-      _: any,
-      args: { id: string },
-      { req }: any,
-      info: GraphQLResolveInfo
-    ) {
-      if (!req.userId) {
-        throw new Error("Authentication required");
+    ),
+    getExpenseById: userAuthResolver(
+      async (
+        _: any,
+        args: { id: string },
+        context: any,
+        info: GraphQLResolveInfo
+      ) => {
+        return await getExpenseById({ id: args.id, info });
       }
-
-      return await getExpenseById({ id: args.id, info });
-    },
+    ),
   },
   Mutation: {
-    async createExpense(
-      _: any,
-      { input }: { input: ExpenseInput },
-      { req }: any
-    ) {
-      if (!req.userId) {
-        throw new Error("Authentication required");
+    createExpense: userAuthResolver(
+      async (_: any, { input }: { input: ExpenseInput }, context: any) => {
+        return await createExpense(input);
       }
+    ),
+    updateExpense: userAuthResolver(
+      async (_: any, { input, expenseId }: UpdateExpenseArgs, context: any) => {
+        const { name, amount, description, tags, userId } = input;
 
-      return await createExpense(input);
-    },
-    async updateExpense(
-      _: any,
-      { input, expenseId }: UpdateExpenseArgs,
-      { req }: any
-    ) {
-      if (!req.userId) {
-        throw new Error("Authentication required");
+        const filteredInput: UpdateExpenseInput = {
+          name: name!,
+          amount: amount!,
+          description: description!,
+          tags: tags!,
+          userId: userId!,
+        };
+
+        return await updateExpense(filteredInput, expenseId);
       }
-
-      const { name, amount, description, tags, userId } = input;
-
-      const filteredInput: UpdateExpenseInput = {
-        name: name!,
-        amount: amount!,
-        description: description!,
-        tags: tags!,
-        userId: userId!,
-      };
-
-      return await updateExpense(filteredInput, expenseId);
-    },
-    async deleteExpense(_: any, { id }: { id: string }, { req }: any) {
-      if (!req.userId) {
-        throw new Error("Authentication required");
+    ),
+    deleteExpense: userAuthResolver(
+      async (_: any, { id }: { id: string }, context: any) => {
+        return await deleteExpense({ id });
       }
-
-      return await deleteExpense({ id });
-    },
+    ),
   },
 };

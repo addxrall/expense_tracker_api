@@ -27,7 +27,12 @@ type Query {
   users: [User]
 }
 
+type LogoutResponse {
+  message: String
+}
+
 type Mutation {
   registerUser(registerUserInput: RegisterUserInput): User
   loginUser(loginUserInput: LoginUserInput): User
+  logoutUser: LogoutResponse
 }

@@ -5,34 +5,22 @@ import {
   getUsers,
   createNewUser,
   login,
+  logout,
 } from "../services/user.service";
+import { userAuthResolver } from "../utils/authResolver";
 
 export const usersResolver = {
   Query: {
-    async users(
-      _: any,
-      args: Record<string, any>,
-      { req }: any,
-      info: GraphQLResolveInfo
-    ) {
-      if (!req.userId) {
-        throw new Error("Authentication required");
+    users: userAuthResolver(
+      async (_: any, args: any, context: any, info: GraphQLResolveInfo) => {
+        return await getUsers();
       }
-
-      return await getUsers();
-    },
-    async user(
-      _: any,
-      args: Record<string, any>,
-      { req }: any,
-      info: GraphQLResolveInfo
-    ) {
-      if (!req.userId) {
-        throw new Error("Authentication required");
+    ),
+    user: userAuthResolver(
+      async (_: any, args: any, context: any, info: GraphQLResolveInfo) => {
+        return await getUser({ id: args.id, info });
       }
-
-      return await getUser({ id: args.id, info });
-    },
+    ),
   },
   Mutation: {
     async registerUser(
@@ -50,6 +38,14 @@ export const usersResolver = {
       info: GraphQLResolveInfo
     ) {
       return await login(loginUserInput, res);
+    },
+    async logoutUser(
+      _: any,
+      args: any,
+      { res }: any,
+      info: GraphQLResolveInfo
+    ) {
+      return await logout(res);
     },
   },
 };

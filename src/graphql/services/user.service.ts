@@ -91,3 +91,8 @@ export const login = async ({ email, password }: LoginUserInputT, res: any) => {
 
   return { ...user, token };
 };
+
+export const logout = async (res: any) => {
+  res.clearCookie("token");
+  return { message: "Logout successful" };
+};
