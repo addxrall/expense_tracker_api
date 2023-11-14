@@ -119,17 +119,45 @@ export const isUserLoggedIn = async (req: any) => {
 
   try {
     const decodedToken = jwt.verify(token, jwtKey);
-    const { email, userId } = decodedToken;
+    const { email } = decodedToken;
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
 
     if (existingUser) {
-      return { email, userId };
+      return { email };
     }
 
     return null;
   } catch (error) {
     console.error("Error verifying token:", error);
     return null;
+  }
+};
+
+export const getCurrentUser = async (req: any) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return null;
+  }
+
+  if (!jwtKey) {
+    throw new Error("Cannot get JWT KEY from server files");
+  }
+
+  try {
+    const decodedToken = jwt.verify(token, jwtKey);
+    const { email } = decodedToken;
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (user) {
+      return {
+        email: user.email,
+        username: user.username,
+        userId: user.id,
+      };
+    }
+  } catch (err: any) {
+    console.error(err);
   }
 };

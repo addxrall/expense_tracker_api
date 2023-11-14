@@ -1,5 +1,5 @@
-import { isUserLoggedIn } from "./../services/user.service";
 import { LoginUserInputT, RegisterUserInputT } from "./../types";
+import { getCurrentUser, isUserLoggedIn } from "./../services/user.service";
 import { GraphQLResolveInfo } from "graphql";
 import {
   getUser,
@@ -30,6 +30,11 @@ export const usersResolver = {
     ) {
       return await isUserLoggedIn(req);
     },
+    currentUser: userAuthResolver(
+      async (_: any, args: any, { req }: any, info: GraphQLResolveInfo) => {
+        return await getCurrentUser(req);
+      }
+    ),
   },
   Mutation: {
     async registerUser(
