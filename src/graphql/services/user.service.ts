@@ -20,7 +20,21 @@ export const getUsers = async () => {
 };
 
 export const getUser = async ({ id }: GetUserArgs) => {
-  return await prisma.user.findUnique({ where: { id } });
+  const user = await prisma.user.findUnique({ where: { id } });
+  const usersExpenses = await prisma.expense.findMany({
+    where: {
+      userId: id,
+    },
+  });
+
+  if (!user) {
+    throw new Error("User doesn't exist");
+  }
+
+  return {
+    ...user,
+    expenses: usersExpenses,
+  };
 };
 
 export const createNewUser = async (
