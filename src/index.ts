@@ -26,7 +26,7 @@ const bootstrapServer = async () => {
   app.use(
     cors({
       credentials: true,
-      origin: `http://localhost:${port}`,
+      origin: `http://localhost:5173`,
     })
   );
 
@@ -38,14 +38,14 @@ const bootstrapServer = async () => {
   app.use(express.urlencoded({ extended: true }));
   app.use(auth);
   app.use(
-    "/graphql",
+    "/api",
     expressMiddleware(server, {
       context: async ({ req, res }: any) => ({ req, res }),
     })
   );
 
   app.listen(port, () => {
-    console.log(`🚀 Graphql ready at http://localhost:${port}/graphql`);
+    console.log(`🚀 Graphql ready at http://localhost:${port}/api`);
   });
 };
 

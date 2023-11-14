@@ -31,9 +31,17 @@ export const createNewUser = async (
     throw new Error("Cannot get JWT KEY from server files");
   }
 
-  const existingUser = await prisma.user.findUnique({ where: { email } });
-  if (existingUser) {
-    throw new Error("User with this email already exists");
+  const existingUserEmail = await prisma.user.findUnique({ where: { email } });
+  const existingUserUsername = await prisma.user.findUnique({
+    where: { username },
+  });
+
+  if (existingUserEmail) {
+    throw new Error("This email is already in use");
+  }
+
+  if (existingUserUsername) {
+    throw new Error("This username is already in use");
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -57,7 +65,7 @@ export const createNewUser = async (
     maxAge: 1000 * 60 * 60 * 24 * 7,
   });
 
-  return { ...newUser, token };
+  return { ...newUser, token, message: "user successfuklly registered" };
 };
 
 export const login = async ({ email, password }: LoginUserInputT, res: any) => {
@@ -83,16 +91,45 @@ export const login = async ({ email, password }: LoginUserInputT, res: any) => {
 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.ENV === "prod",
+    // secure: process.env.ENV === "prod",
+    secure: false,
     maxAge: 1000 * 60 * 60 * 24 * 7,
   });
 
   console.log(`LOGIN REQUEST FOR USER WITH EMAIL: ${email}`);
 
-  return { ...user, token };
+  return { userId: user.id, token, message: "logged in" };
 };
 
 export const logout = async (res: any) => {
   res.clearCookie("token");
   return { message: "Logout successful" };
+};
+
+export const isUserLoggedIn = async (req: any) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return null;
+  }
+
+  if (!jwtKey) {
+    throw new Error("Cannot get JWT KEY from server files");
+  }
+
+  try {
+    const decodedToken = jwt.verify(token, jwtKey);
+    const { email, userId } = decodedToken;
+
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+
+    if (existingUser) {
+      return { email, userId };
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error verifying token:", error);
+    return null;
+  }
 };

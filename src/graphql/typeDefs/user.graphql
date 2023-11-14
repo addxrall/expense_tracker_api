@@ -22,17 +22,29 @@ input UserInput {
   username: String
 }
 
-type Query {
-  user(id: Int!): User
-  users: [User]
-}
-
 type LogoutResponse {
   message: String
 }
 
+type LoginResponse {
+  userId: String
+  token: String
+  message: String
+}
+
+type isUserLoggedInResponse {
+  email: String
+  userId: Int
+}
+
+type Query {
+  user(id: Int!): User
+  users: [User]
+  isUserLoggedIn: isUserLoggedInResponse
+}
+
 type Mutation {
   registerUser(registerUserInput: RegisterUserInput): User
-  loginUser(loginUserInput: LoginUserInput): User
+  loginUser(loginUserInput: LoginUserInput): LoginResponse
   logoutUser: LogoutResponse
 }
