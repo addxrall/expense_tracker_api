@@ -1,5 +1,5 @@
 import { LoginUserInputT, RegisterUserInputT } from "./../types";
-import { getCurrentUser, isUserLoggedIn } from "./../services/user.service";
+import { getCurrentUser, isUserLoggedIn, removeUserAccount } from "./../services/user.service";
 import { GraphQLResolveInfo } from "graphql";
 import {
   getUser,
@@ -61,5 +61,12 @@ export const usersResolver = {
     ) {
       return await logout(res);
     },
+    async removeUserAccount(
+      _: any,
+      { userId }: { userId: number },
+      { req }: any
+    ) {
+      return await removeUserAccount(userId, req)
+    }
   },
 };

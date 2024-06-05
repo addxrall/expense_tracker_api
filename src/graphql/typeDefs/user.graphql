@@ -42,6 +42,10 @@ type currentUserResponse {
   userId: Int
 }
 
+type removeUserAccountResponse {
+  message: String
+}
+
 type Query {
   user(id: Int!): User
   users: [User]
@@ -53,4 +57,5 @@ type Mutation {
   registerUser(registerUserInput: RegisterUserInput): User
   loginUser(loginUserInput: LoginUserInput): LoginResponse
   logoutUser: LogoutResponse
+  removeUserAccount(userId: Int!): removeUserAccountResponse
 }

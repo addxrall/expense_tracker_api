@@ -175,3 +175,30 @@ export const getCurrentUser = async (req: any) => {
     console.error(err);
   }
 };
+
+export const removeUserAccount = async (id: number, req: any) => {
+  const token = req.cookies.token
+  const { userId } = jwt.verify(token, jwtKey)
+
+  const userToDelete = await prisma.user.findUnique({
+    where: {
+      id
+    },
+    select: {
+      id: true
+    }
+  })
+
+  if (!userToDelete) {
+    throw new Error("User with this Id does not exist")
+  }
+
+  if (userId !== userToDelete.id) {
+    throw new Error("You cannot delete this user")
+  }
+
+  await prisma.user.delete({
+    where: userToDelete
+  })
+  return { message: "User account successfully removed" }
+}
