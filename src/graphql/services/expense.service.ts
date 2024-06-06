@@ -27,11 +27,13 @@ export const getExpensesByUserId = async (userId: number) => {
     throw new Error(`User does not exist`);
   }
 
-  return await prisma.expense.findMany({
+  const expenses = await prisma.expense.findMany({
     where: {
       userId: userId,
     },
   });
+
+  return expenses.length > 0 ? expenses : null;
 };
 
 export const getExpenseById = async ({
