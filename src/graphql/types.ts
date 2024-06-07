@@ -1,5 +1,3 @@
-import { LargeNumberLike } from "crypto";
-
 export type Expense = {
   id: string;
   name: string;
@@ -7,6 +5,8 @@ export type Expense = {
   tags: string[];
   userId: string;
   user: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export type User = {

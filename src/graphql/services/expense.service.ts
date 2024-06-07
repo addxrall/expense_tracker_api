@@ -18,7 +18,9 @@ interface ExpenseInput {
 
 const prisma = new PrismaClient();
 
-export const getExpensesByUserId = async (userId: number) => {
+export const getExpensesByUserId = async (
+  userId: number
+): Promise<Expense | null> => {
   const userExists = await prisma.user.findUnique({
     where: { id: userId },
   });
@@ -33,7 +35,19 @@ export const getExpensesByUserId = async (userId: number) => {
     },
   });
 
-  return expenses.length > 0 ? expenses : null;
+  if (expenses.length == 0) {
+    return null;
+  }
+
+  return expenses.map((expense: Expense) => ({
+    ...expense,
+    createdAt: expense.createdAt
+      ? new Date(expense.createdAt).toISOString()
+      : null,
+    updatedAt: expense.updatedAt
+      ? new Date(expense.updatedAt).toISOString()
+      : null,
+  }));
 };
 
 export const getExpenseById = async ({

@@ -4,6 +4,8 @@ type Expense {
   description: String
   amount: Int!
   tags: [String!]!
+  createdAt: String
+  updatedAt: String
 }
 
 type DeletedExpense {
