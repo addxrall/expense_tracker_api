@@ -1,6 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 import { GraphQLResolveInfo } from "graphql";
-import { Expense, UpdateExpenseInput } from "../types";
+import { DeletedExpenseOutput, Expense, UpdateExpenseInput } from "../types";
 
 interface GetExpenseArgs {
   id: string;
@@ -95,7 +95,7 @@ export const updateExpense = async (
 
 export const deleteExpense = async ({
   id,
-}: GetExpenseArgs): Promise<Expense | null> => {
+}: GetExpenseArgs): Promise<DeletedExpenseOutput> => {
   const expenseExists = await prisma.expense.findUnique({
     where: { id },
   });
@@ -104,5 +104,9 @@ export const deleteExpense = async ({
     throw new Error(`Expense does not exist`);
   }
   const deletedExpense = await prisma.expense.delete({ where: { id } });
-  return deletedExpense;
+
+  return {
+    expense: deletedExpense,
+    message: "Expense Deleted Successfully",
+  };
 };

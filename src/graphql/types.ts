@@ -53,3 +53,8 @@ export interface UpdateExpenseArgs {
   };
   expenseId: string;
 }
+
+export type DeletedExpenseOutput = {
+  expense: Expense;
+  message: string;
+};

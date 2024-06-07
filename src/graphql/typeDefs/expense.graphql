@@ -6,6 +6,11 @@ type Expense {
   tags: [String!]!
 }
 
+type DeletedExpense {
+  expense: Expense
+  message: String
+}
+
 input ExpenseInput {
   name: String!
   amount: Int!
@@ -30,5 +35,5 @@ type Query {
 type Mutation {
   createExpense(input: ExpenseInput!): Expense!
   updateExpense(input: UpdateExpenseInput!, expenseId: String!): Expense
-  deleteExpense(id: String!): Expense
+  deleteExpense(id: String!): DeletedExpense
 }
