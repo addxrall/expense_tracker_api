@@ -33,6 +33,9 @@ export const getExpensesByUserId = async (
     where: {
       userId: userId,
     },
+    orderBy: {
+      updatedAt: "desc",
+    },
   });
 
   if (expenses.length == 0) {
