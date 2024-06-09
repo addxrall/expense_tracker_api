@@ -197,8 +197,15 @@ export const removeUserAccount = async (id: number, req: any) => {
     throw new Error("You cannot delete this user");
   }
 
+  await prisma.expense.deleteMany({
+    where: {
+      userId: userId,
+    },
+  });
+
   await prisma.user.delete({
     where: userToDelete,
   });
+
   return { message: "User account successfully removed" };
 };
